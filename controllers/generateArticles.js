@@ -10,24 +10,33 @@ const openai = new OpenAIApi(configuration);
 
 const generateArticle = async (req, res) => {
     const title = req.body.title;
-    console.log(req.body);
-    // const title = req.body.title
-    console.log(title);
+    // console.log(req.body);
+    // console.log(title);
 
-    const response = await openai.createCompletion({
-            model: "text-davinci-003",
-            prompt: `Topic: ${title}, make an article in 1000 words`,
-            temperature: 0.8,
-            max_tokens: 1000,
-            top_p: 1.0,
-            frequency_penalty: 0.5,
-            presence_penalty: 0.0
+    const responseTitle = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `Paraphrase the folowing title for the article: ${title}`,
+        temperature: 1,
+        max_tokens: 100,
+        top_p: 1.0,
+        frequency_penalty: 0.5,
+        presence_penalty: 0.0
     })
 
-    const articleText =  response.data.choices[0].text;
-    // console.log(articleText);
+    const responseText = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `Topic: ${title}, make an article in 1000 words`,
+        temperature: 0.8,
+        max_tokens: 4000,
+        top_p: 1.0,
+        frequency_penalty: 0.5,
+        presence_penalty: 0.0
+    })
 
-    const newArticle =  await Article.create({title: title, body: articleText})
+    const articleText = responseText.data.choices[0].text;
+    const articleTitle = responseTitle.data.choices[0].text;
+
+    const newArticle =  await Article.create({title: articleTitle, body: articleText})
     res.status(200).json(newArticle)
 }
 
