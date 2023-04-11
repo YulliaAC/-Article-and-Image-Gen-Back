@@ -10,7 +10,10 @@ const articleSchema = new mongoose.Schema (
         body: {
             type: String,
             required: [true, 'Set body for article'],
-        }
+        },
+        metaTags: {
+            type: Object,
+        },
     },
     {versionKey: false}
 );
