@@ -50,7 +50,7 @@ const generateArticle = async (req, res) => {
     const objMetaTags = eval('(' + metaTags + ')');
     // console.log(obj);
 
-    const newArticle =  await Article.create({title: articleTitle, body: articleText, metaTags: objMetaTags})
+    const newArticle =  await Article.create({artTitle: articleTitle, body: articleText, metaTags: objMetaTags})
     res.status(200).json(newArticle)
 }
 

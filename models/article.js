@@ -3,7 +3,7 @@ const {handleMongooseError} = require("../helpers");
 
 const articleSchema = new mongoose.Schema (
     {
-        title: {
+        artTitle: {
             type: String,
             required: [true, 'Set title for article'],
         },
