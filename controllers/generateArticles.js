@@ -35,7 +35,7 @@ const generateArticle = async (req, res) => {
 
     const responseTags = await openai.createCompletion({
         model: "text-davinci-003",
-        prompt: `Create meta tags (title, 1 sentense description, keywords) for web page with the title: ${title}, return JS object`,
+        prompt: `Create meta tags (title, 1 sentense description, keywords) for web page with the title: ${title}, return parseble JS object`,
         temperature: 1,
         max_tokens: 1000,
         top_p: 1.0,
@@ -47,8 +47,10 @@ const generateArticle = async (req, res) => {
     const articleText = responseText.data.choices[0].text;
     const articleTitle = responseTitle.data.choices[0].text;
     const metaTags = responseTags.data.choices[0].text;
+    const objMetaTags = eval('(' + metaTags + ')');
+    // console.log(obj);
 
-    const newArticle =  await Article.create({title: articleTitle, body: articleText, metaTags: metaTags})
+    const newArticle =  await Article.create({title: articleTitle, body: articleText, metaTags: objMetaTags})
     res.status(200).json(newArticle)
 }
 
