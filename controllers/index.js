@@ -1,6 +1,6 @@
 const {ctrlWrapper} = require('../helpers');
 const {generateArticle} = require('./generateArticles');
-const {getArticle} = require('./getMetaTags');
+const {getArticle} = require('./getArticle');
 
 module.exports = {
     generateArticle: ctrlWrapper(generateArticle),

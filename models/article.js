@@ -5,14 +5,15 @@ const articleSchema = new mongoose.Schema (
     {
         artTitle: {
             type: String,
-            required: [true, 'Set title for article'],
+            required: [true, 'Set title for the article'],
         },
         body: {
             type: String,
-            required: [true, 'Set body for article'],
+            required: [true, 'Set body for the article'],
         },
         metaTags: {
             type: Object,
+            required: [true, 'Set meta tags for the article'],
         },
     },
     {versionKey: false}
