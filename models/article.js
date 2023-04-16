@@ -15,6 +15,9 @@ const articleSchema = new mongoose.Schema (
             type: Object,
             required: [true, 'Set meta tags for the article'],
         },
+        image: {
+            type: String,
+        }
     },
     {versionKey: false}
 );
@@ -24,5 +27,5 @@ articleSchema.post("save", handleMongooseError);
 const Article = mongoose.model ('articles', articleSchema);
 
 module.exports = {
-  Article,
+  Article
 };
