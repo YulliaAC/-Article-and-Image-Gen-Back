@@ -102,7 +102,7 @@ const generateArticle = async (req, res) => {
     return articleLinks.map((articleLink) => articleLink.href);
   });
 
-  const maxLinks = 3;
+  const maxLinks = 10;
   let countLinks = 0;
   let filterLinks = [];
 
