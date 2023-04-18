@@ -15,6 +15,7 @@ const start = async () => {
       console.log("Database connection successful");
       app.listen(3005, () => {
         console.log("Server running. Use our API on port: 3005")
+
       })
     } catch (error) {
       console.log(error.message);
