@@ -1,4 +1,5 @@
 const { Configuration, OpenAIApi } = require("openai");
+const { Client, Intents, GatewayIntentBits } = require('discord.js');
 const puppeteer = require("puppeteer");
 const { Article } = require("../models/article");
 require("dotenv").config();
@@ -17,6 +18,26 @@ const fetchTittle = async (page, url) => {
   const value = await page.evaluate((element) => element.textContent, element);
   return value;
 };
+
+const client = new Client({ intents: [
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.MessageContent,
+  GatewayIntentBits.GuildMembers,
+], });
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
+
+client.on('messageCreate', message => {
+  console.log(`${message}`);
+  if (message.content.includes('893133616538869790')) {
+    console.log('it`s midjorney');
+  }
+})
+
+client.login(process.env.DISCORD_TOKEN)
+
 
 const generateAiArticle = async (title) => {
   const responseTitle = await openai.createCompletion({
