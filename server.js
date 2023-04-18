@@ -13,8 +13,8 @@ const start = async () => {
     try {
       await connectMongo();
       console.log("Database connection successful");
-      app.listen(4000, () => {
-        console.log("Server running. Use our API on port: 4000")
+      app.listen(5000, () => {
+        console.log("Server running. Use our API on port: 5000")
       })
     } catch (error) {
       console.log(error.message);
