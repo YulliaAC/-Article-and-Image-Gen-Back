@@ -1,9 +1,22 @@
 const { Configuration, OpenAIApi } = require("openai");
-const { Client, Intents, GatewayIntentBits } = require('discord.js');
+const { Client, Intents, GatewayIntentBits, Collection } = require("discord.js");
 const puppeteer = require("puppeteer");
 const { Article } = require("../models/article");
 require("dotenv").config();
 const validUrl = require("valid-url");
+const robot = require("robotjs");
+// const Replicate = require("replicate");
+
+// async function generateImage(prompt) {
+//   try {
+//     const imageUrls = await midjourney(prompt);
+//     console.log(imageUrls);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
+
+// console.log(generateImage('mdjrny-v4 style a painting of a ginger cat.'));
 
 const configuration = new Configuration({
   apiKey: process.env.OPEN_AI_KEY,
@@ -19,25 +32,31 @@ const fetchTittle = async (page, url) => {
   return value;
 };
 
-const client = new Client({ intents: [
-  GatewayIntentBits.Guilds,
-  GatewayIntentBits.GuildMessages,
-  GatewayIntentBits.MessageContent,
-  GatewayIntentBits.GuildMembers,
-], });
-client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
+  ],
 });
 
-client.on('messageCreate', message => {
-  console.log(`${message}`);
-  if (message.content.includes('893133616538869790')) {
-    console.log('it`s midjorney');
-  }
-})
 
-client.login(process.env.DISCORD_TOKEN)
+// const imageGen = (title) => {
 
+// client.on('messageCreate', message => {
+//     robot.typeString(`/imagine prompt: ${title}`);
+//     setTimeout(() => robot.keyTap("enter"), 1000);
+
+// if (message.content.includes('893133616538869790')) {
+//   console.log('it`s midjorney');
+//   console.log(`${message}`);
+//   message.attachments.map((el) => el.url);
+// }
+
+// })
+// // client.login(process.env.DISCORD_TOKEN)
+// }
 
 const generateAiArticle = async (title) => {
   const responseTitle = await openai.createCompletion({
@@ -70,12 +89,26 @@ const generateAiArticle = async (title) => {
     presence_penalty: 0.0,
   });
 
-  const responseImage = await openai.createImage({
-    prompt: `${title}`,
-    n: 1,
-    size: '1024x1024'
-})
-  
+  // const replicate = new Replicate({
+  //   auth: process.env.OPENJOURNEY_TOKEN,
+  // });
+
+  // const output = await replicate.run(
+  //   "prompthero/openjourney:9936c2001faa2194a261c01381f90e65261879985476014a0a37a334593a05eb",
+  //   {
+  //     input: {
+  //       prompt: "mdjrny-v4 he List of Video Games Coming to Xbox Game Pass in April 2023 Is Out Now"
+  //     }
+  //   }
+  // );
+
+  // console.log(output);
+
+  //   const responseImage = await openai.createImage({
+  //     prompt: `${title}`,
+  //     n: 1,
+  //     size: '1024x1024'
+  // })
 
   const metaTagsRaw = responseTags.data.choices[0].text.split("\n");
 
@@ -89,12 +122,14 @@ const generateAiArticle = async (title) => {
     }
   }
 
+  let image;
   const article = {
     text: responseText.data.choices[0].text,
     title: responseTitle.data.choices[0].text,
     tags: tags,
-    image: responseImage.data.data[0].url
+    image: image,
   };
+  // responseImage.data.data[0].url
   return article;
 };
 
@@ -108,7 +143,7 @@ const generateArticle = async (req, res) => {
     return res.status(400).json({ message: `url: ${url} is not valid` });
   }
 
-  console.log(`User provide such url for generate articles ${url}`);
+  // console.log(`User provide such url for generate articles ${url}`);
 
   const browser = await puppeteer.launch({});
   const page = await browser.newPage();
@@ -123,7 +158,7 @@ const generateArticle = async (req, res) => {
     return articleLinks.map((articleLink) => articleLink.href);
   });
 
-  const maxLinks = 2;
+  const maxLinks = 1;
   let countLinks = 0;
   let filterLinks = [];
 
@@ -142,10 +177,51 @@ const generateArticle = async (req, res) => {
     titles.push(await fetchTittle(page, titile_links));
   }
 
+  // const image = (title) => {
+  //   client.on('ready', () => {
+  //     console.log(`Logged in as ${client.user.tag}!`);
+  //    });
+
+  //   robot.typeString(`/imagine prompt:${title}`);
+  //   robot.keyTap("enter")
+
+  //   client.on('messageCreate', message => {
+
+  //   if (message.content.includes('893133616538869790')) {
+  //     console.log('it`s midjorney');
+  //     console.log(`${message}`);
+  //     return message.attachments.map((el) => el.url);
+  //   }})
+  //   client.login(process.env.DISCORD_TOKEN)
+  // }
+
   await browser.close();
+
+
   let openAIResponces = [];
   for (const title of titles) {
     openAIResponces.push(generateAiArticle(title));
+
+    client.on("ready", () => {
+      const channel = client.channels.cache.get('1097873441333448789')
+      channel.send('image')
+      console.log(`Logged in as ${client.user.tag}!`);
+    });
+
+    client.on("messageCreate", (message) => {
+      if (message.content === 'image') {
+        robot.typeString(`/imagine prompt: ${title}`);
+        setTimeout(() => robot.keyTap("enter"), 1000);
+        // robot.keyTap('enter')
+      }
+      
+      if (message.content.includes("893133616538869790")) {
+        console.log("it`s midjorney");
+        console.log(`${message}`);
+        message.attachments.map((el) => el.url);
+      }
+    });
+    client.login(process.env.DISCORD_TOKEN);
   }
 
   const generateArticles = Promise.all(openAIResponces);
@@ -158,7 +234,7 @@ const generateArticle = async (req, res) => {
       artTitle: article.title,
       body: article.text,
       metaTags: article.tags,
-      image: article.image
+      image: article.image,
     });
     ids.push(newArticle._id);
   }
@@ -168,5 +244,3 @@ const generateArticle = async (req, res) => {
 module.exports = {
   generateArticle,
 };
-
-
