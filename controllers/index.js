@@ -1,11 +1,13 @@
-const {generateArticle} = require('./generateArticles');
+const {generateAiArticle} = require('./generateArticles');
 const {getArticle} = require('./getArticle');
+const {scrapTitles} = require('./scrapTitles');
 
 
 
 
 
 module.exports = {
-    generateArticle,
-    getArticle
+    generateAiArticle,
+    getArticle,
+    scrapTitles
 }
