@@ -28,13 +28,13 @@ const connectDiscord = async () => {
   // client.login(process.env.DISCORD_TOKEN);
 }
 
-client.login(process.env.DISCORD_TOKEN);
+// client.login(process.env.DISCORD_TOKEN);
 
 const start = async () => {
     try {
       await connectMongo();
       console.log("Database connection successful");
-      await connectDiscord();
+      // await connectDiscord();
       app.listen(3005, () => {
         console.log("Server running. Use our API on port: 3005")
 
