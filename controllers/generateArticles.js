@@ -1,22 +1,10 @@
 const { Configuration, OpenAIApi } = require("openai");
-const { Client, Intents, GatewayIntentBits, Collection } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 const puppeteer = require("puppeteer");
 const { Article } = require("../models/article");
 require("dotenv").config();
 const validUrl = require("valid-url");
 const robot = require("robotjs");
-// const Replicate = require("replicate");
-
-// async function generateImage(prompt) {
-//   try {
-//     const imageUrls = await midjourney(prompt);
-//     console.log(imageUrls);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
-
-// console.log(generateImage('mdjrny-v4 style a painting of a ginger cat.'));
 
 const configuration = new Configuration({
   apiKey: process.env.OPEN_AI_KEY,
@@ -37,7 +25,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers,
+    // GatewayIntentBits.GuildMembers,
   ],
 });
 
@@ -89,21 +77,6 @@ const generateAiArticle = async (title) => {
     presence_penalty: 0.0,
   });
 
-  // const replicate = new Replicate({
-  //   auth: process.env.OPENJOURNEY_TOKEN,
-  // });
-
-  // const output = await replicate.run(
-  //   "prompthero/openjourney:9936c2001faa2194a261c01381f90e65261879985476014a0a37a334593a05eb",
-  //   {
-  //     input: {
-  //       prompt: "mdjrny-v4 he List of Video Games Coming to Xbox Game Pass in April 2023 Is Out Now"
-  //     }
-  //   }
-  // );
-
-  // console.log(output);
-
   //   const responseImage = await openai.createImage({
   //     prompt: `${title}`,
   //     n: 1,
@@ -142,8 +115,6 @@ const generateArticle = async (req, res) => {
   if (!validUrl.isUri(url)) {
     return res.status(400).json({ message: `url: ${url} is not valid` });
   }
-
-  // console.log(`User provide such url for generate articles ${url}`);
 
   const browser = await puppeteer.launch({});
   const page = await browser.newPage();
@@ -211,14 +182,13 @@ const generateArticle = async (req, res) => {
     client.on("messageCreate", (message) => {
       if (message.content === 'image') {
         robot.typeString(`/imagine prompt: ${title}`);
-        setTimeout(() => robot.keyTap("enter"), 1000);
-        // robot.keyTap('enter')
+        setTimeout(() => robot.keyTap("enter"), 1500);
       }
       
       if (message.content.includes("893133616538869790")) {
         console.log("it`s midjorney");
         console.log(`${message}`);
-        message.attachments.map((el) => el.url);
+        image = message.attachments.map((el) => el.url);
       }
     });
     client.login(process.env.DISCORD_TOKEN);
