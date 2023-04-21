@@ -1,10 +1,13 @@
 const { Configuration, OpenAIApi } = require("openai");
-const { Client, GatewayIntentBits, TextInputBuilder } = require("discord.js");
 const puppeteer = require("puppeteer");
 const { Article } = require("../models/article");
 require("dotenv").config();
 const validUrl = require("valid-url");
-const robot = require("robotjs");
+const Replicate = require("replicate");
+
+const replicate = new Replicate({
+    auth: process.env.OPENJOURNEY_TOKEN,
+  });
 
 const configuration = new Configuration({
   apiKey: process.env.OPEN_AI_KEY,
@@ -20,20 +23,6 @@ const fetchTittle = async (page, url) => {
   return value;
 };
 
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    // GatewayIntentBits.GuildMembers,
-  ],
-});
-
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-});
-
-client.login(process.env.DISCORD_TOKEN);
 
 const generateAiArticle = async (title) => {
   const responseTitle = await openai.createCompletion({
@@ -66,11 +55,13 @@ const generateAiArticle = async (title) => {
     presence_penalty: 0.0,
   });
 
-  //   const responseImage = await openai.createImage({
-  //     prompt: `${title}`,
-  //     n: 1,
-  //     size: '1024x1024'
-  // })
+    const responseImage = await replicate.run(
+    `prompthero/openjourney:${process.env.OPENJOURNEY_REQ_KEY}`,
+    {
+      input: {
+        prompt: `mdjrny-v4 ${title}`,
+      }
+    });
 
   const metaTagsRaw = responseTags.data.choices[0].text.split("\n");
 
@@ -84,16 +75,18 @@ const generateAiArticle = async (title) => {
     }
   }
 
-  let image;
+
   const article = {
     text: responseText.data.choices[0].text,
     title: responseTitle.data.choices[0].text,
     tags: tags,
-    image: image,
+    image: responseImage[0],
   };
   // responseImage.data.data[0].url
   return article;
 };
+
+
 
 const generateArticle = async (req, res) => {
   const url = req.body.url;
@@ -141,28 +134,6 @@ const generateArticle = async (req, res) => {
   let openAIResponces = [];
   for (const title of titles) {
     openAIResponces.push(generateAiArticle(title));
-
-    client.channels
-    .fetch("1097873441333448789")
-    .then((channel) => {
-        console.log(`Found channel: ${channel.name}`);
-        channel.send("image");
-    })
-    .catch(console.error);
-
-    client.on("messageCreate", (message) => {
-      if (message.content === "image") {
-            robot.typeString(`/imagine prompt: ${title}`);
-            setTimeout(() => robot.keyTap("enter"), 1000);
-            setTimeout(() => robot.keyTap("enter"), 2000);
-      }
-
-      if (message.content.includes("893133616538869790")) {
-        console.log("it`s midjorney");
-        image = message.attachments.map((el) => el.url);
-        console.log(image);
-      }
-    });
   }
 
   const generateArticles = Promise.all(openAIResponces);
