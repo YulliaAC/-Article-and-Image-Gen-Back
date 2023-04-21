@@ -91,6 +91,7 @@ const generateAiArticle = async (title) => {
 
 
 const generateArticle = async (req, res) => {
+
   const url = req.body.url;
   if (url === "") {
     return res.status(400).json({ message: "provide url in body" });

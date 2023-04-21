@@ -1,10 +1,11 @@
 const express = require('express');
-const {generateArticle, getArticle, storeGoogleSheets} = require('../../controllers')
+const {generateArticle, getArticle} = require('../../controllers')
+const {storeGoogleSheets} = require('../../middlewares/storeGoogleMiddleware');
 
 const router = express.Router();
 
-router.post('/', generateArticle);
+router.post('/', storeGoogleSheets, generateArticle);
 router.get('/generated/:articleId', getArticle);
-router.get('/store', storeGoogleSheets);
+// router.get('/store', storeGoogleSheets);
 
 module.exports = router;
