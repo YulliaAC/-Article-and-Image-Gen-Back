@@ -1,9 +1,10 @@
 const { Configuration, OpenAIApi } = require("openai");
 const puppeteer = require("puppeteer");
 const { Article } = require("../models/article");
-require("dotenv").config();
 const validUrl = require("valid-url");
 const Replicate = require("replicate");
+// const {google} = require('googleapis');
+require("dotenv").config();
 
 const replicate = new Replicate({
     auth: process.env.OPENJOURNEY_TOKEN,
@@ -37,7 +38,8 @@ const generateAiArticle = async (title) => {
 
   const responseText = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: `Topic: ${title}, make an article in 1000 words, make the article valid for anti-bot detecting`,
+    prompt: `Topic: ${title}, make an article in 1000 words`,
+    // , make the article valid for anti-bot detecting
     temperature: 0.8,
     max_tokens: 4000,
     top_p: 1.0,
@@ -47,7 +49,7 @@ const generateAiArticle = async (title) => {
 
   const responseTags = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: `Create meta tags (title, 1 sentense description, keywords) for web page with the title: ${title}, put this tags to YAML object and escape special characters`,
+    prompt: `Create meta tags (title, 1 sentense description, keywords) for web page with the title: ${title}, return this tags as YAML object and escape special characters`,
     temperature: 1,
     max_tokens: 1000,
     top_p: 1.0,

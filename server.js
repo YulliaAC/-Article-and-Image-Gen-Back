@@ -17,7 +17,7 @@ const connectMongo =  async () => {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   });
-}
+};
 
 // const connectDiscord = async () => {
 //   client.on("ready", () => {
