@@ -1,9 +1,9 @@
 const {generateArticle} = require('./generateArticles');
 const {getArticle} = require('./getArticle');
-// const {storeGoogleSheets} = require('../middlewares/storeGoogleSheets');
+const {storeGoogleSheets} = require('./storeGoogleSheets');
 
 module.exports = {
     generateArticle,
     getArticle,
-    // storeGoogleSheets
+    storeGoogleSheets
 }

@@ -1,4 +1,4 @@
-const fs = require("fs");
+const {FormData} = require('../models/formData');
 const { google } = require("googleapis");
 require("dotenv").config();
 
@@ -30,7 +30,6 @@ const storeGoogleSheets = async (req, res) => {
   const rows = storedData.data.values;
   if (rows.length) {
     // rows.shift();
-    console.log(rows);
     for (const row of rows) {
       answers.push({
         createWith: row[0],
@@ -45,10 +44,13 @@ const storeGoogleSheets = async (req, res) => {
   } else {
     console.log("No data found.");
   }
-  
-  res.status(200).json(answers);
+  const newFormData = await FormData.create(answers);
+
+
+  console.log(newFormData);
+  res.status(201).json(newFormData);
 };
 
 module.exports = {
-  storeGoogleSheets,
+  storeGoogleSheets
 };
